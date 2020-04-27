@@ -1,0 +1,83 @@
+********************************************/
+判断读入文法是否为一个LL(1)文法
+********************************************/
+int ll1()
+{
+    int i,j,length,result=1;
+	char temp[50];
+	for(j=0;j<=49;j++)
+	{	                           /*初始化*/
+		first[j][0]='\0';
+	    follow[j][0]='\0';
+		first1[j][0]='\0';
+		select[j][0]='\0';
+		TEMP[j]='\0';
+		temp[j]='\0';
+		f[j]='0';
+		F[j]='0';
+	}
+	for(j=0;j<=strlen(v)-1;j++)
+	    first2(j);                /*求单个符号的FIRST集合*/
+	printf("\nfirst1:");
+	for(j=0;j<=strlen(v)-1;j++)
+		printf("%c:%s  ",v[j],first1[j]);
+    printf("\nempty:%s",empty);
+	printf("\n:::\n_emp:");
+	for(j=0;j<=strlen(v)-1;j++)
+        printf("%d  ",_emp(v[j]));
+	for(i=0;i<=count-1;i++)
+	    FIRST(i,right[i]);          /*求FIRST*/
+	printf("\n");
+	for(j=0;j<=strlen(non_ter)-1;j++)
+    {                               /*求FOLLOW*/
+		if(fo[j]==0)
+		{
+			fo[0]='\0';
+		    FOLLOW(j);
+		}
+    }
+	printf("\nfirst:");
+	for(i=0;i<=count-1;i++)
+	    printf("%s ",first[i]);
+	printf("\nfollow:");
+    for(i=0;i<=strlen(non_ter)-1;i++)
+	    printf("%s ",follow[i]);
+	for(i=0;i<=count-1;i++)
+	{                          /*求每一产生式的SELECT集合*/
+        memcpy(select[i],first[i],strlen(first[i]));
+        select[i][strlen(first[i])]='\0';
+		for(j=0;j<=strlen(right[i])-1;j++)
+			result*=_emp(right[i][j]);
+		if(strlen(right[i])==1&&right[i][0]=='^')
+			result=1;
+		if(result==1)
+		{
+			for(j=0;;j++)
+				if(v[j]==left[i])
+					break;
+			merge(select[i],follow[j],1);
+		}
+	}
+	printf("\nselect:");
+	for(i=0;i<=count-1;i++)
+	    printf("%s ",select[i]);
+	memcpy(temp,select[0],strlen(select[0]));
+	temp[strlen(select[0])]='\0';
+	for(i=1;i<=count-1;i++)
+	{                 /*判断输入文法是否为LL(1)文法*/
+        length=strlen(temp);
+		if(left[i]==left[i-1])
+		{
+			merge(temp,select[i],1);
+			if(strlen(temp)<length+strlen(select[i]))
+				return(0);
+		}
+		else
+		{
+			temp[0]='\0';
+		    memcpy(temp,select[i],strlen(select[i]));
+			temp[strlen(select[i])]='\0';
+		}
+	}
+	return(1);
+}
